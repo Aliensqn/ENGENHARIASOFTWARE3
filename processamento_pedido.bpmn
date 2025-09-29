@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <process id="ProcessamentoPedido" isExecutable="true">
+    <laneSet>
+      <lane id="sistema_loja" name="Sistema da Loja"/>
+      <lane id="equipe_vendas" name="Equipe de Vendas/Atendimento"/>
+      <lane id="fornecedor" name="Fornecedor"/>
+      <lane id="logistica" name="Logística"/>
+    </laneSet>
+
+    <startEvent id="start" name="Recebe pedido (via e-commerce)"/>
+    <task id="valida_pagamento" name="Valida pagamento (integração Yampi/Appmax)"/>
+    <exclusiveGateway id="gateway_pagamento" name="Pagamento aprovado?"/>
+    <task id="pagamento_recusado" name="Atualiza status como Pagamento Recusado"/>
+    <task id="aciona_cliente" name="Aciona cliente (via WhatsApp/E-mail)"/>
+    <endEvent id="end_recusado" name="Processo Encerrado"/>
+    <task id="pedido_confirmado" name="Atualiza status como Pedido Confirmado"/>
+    <task id="gera_ordem" name="Gera ordem de compra e envia ao Fornecedor"/>
+    <task id="recebe_ordem" name="Recebe ordem, separa e prepara o produto"/>
+    <task id="disponibiliza_produto" name="Disponibiliza produto para coleta da logística"/>
+    <task id="coleta_produto" name="Coleta produto no fornecedor"/>
+    <task id="realiza_envio" name="Realiza envio"/>
+    <task id="recebe_rastreio" name="Recebe dados de rastreio e atualiza pedido"/>
+    <task id="disponibiliza_rastreio" name="Disponibiliza rastreio ao cliente (automatizado)"/>
+    <task id="realiza_entrega" name="Realiza entrega do pedido"/>
+    <task id="pedido_concluido" name="Atualiza pedido como Concluído"/>
+    <task id="solicita_feedback" name="Solicita feedback pós-venda"/>
+    <endEvent id="end_aprovado" name="Processo Encerrado"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="valida_pagamento"/>
+    <sequenceFlow id="flow2" sourceRef="valida_pagamento" targetRef="gateway_pagamento"/>
+    <sequenceFlow id="flow3" sourceRef="gateway_pagamento" targetRef="pagamento_recusado" name="Não"/>
+    <sequenceFlow id="flow4" sourceRef="pagamento_recusado" targetRef="aciona_cliente"/>
+    <sequenceFlow id="flow5" sourceRef="aciona_cliente" targetRef="end_recusado"/>
+    <sequenceFlow id="flow6" sourceRef="gateway_pagamento" targetRef="pedido_confirmado" name="Sim"/>
+    <sequenceFlow id="flow7" sourceRef="pedido_confirmado" targetRef="gera_ordem"/>
+    <sequenceFlow id="flow8" sourceRef="gera_ordem" targetRef="recebe_ordem"/>
+    <sequenceFlow id="flow9" sourceRef="recebe_ordem" targetRef="disponibiliza_produto"/>
+    <sequenceFlow id="flow10" sourceRef="disponibiliza_produto" targetRef="coleta_produto"/>
+    <sequenceFlow id="flow11" sourceRef="coleta_produto" targetRef="realiza_envio"/>
+    <sequenceFlow id="flow12" sourceRef="realiza_envio" targetRef="recebe_rastreio"/>
+    <sequenceFlow id="flow13" sourceRef="recebe_rastreio" targetRef="disponibiliza_rastreio"/>
+    <sequenceFlow id="flow14" sourceRef="disponibiliza_rastreio" targetRef="realiza_entrega"/>
+    <sequenceFlow id="flow15" sourceRef="realiza_entrega" targetRef="pedido_concluido"/>
+    <sequenceFlow id="flow16" sourceRef="pedido_concluido" targetRef="solicita_feedback"/>
+    <sequenceFlow id="flow17" sourceRef="solicita_feedback" targetRef="end_aprovado"/>
+  </process>
+</definitions>
